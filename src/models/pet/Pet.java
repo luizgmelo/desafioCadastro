@@ -9,11 +9,11 @@ public class Pet {
     private Type type;
     private Sex sex;
     private Address address;
-    private int age;
-    private double weight;
+    private String age;
+    private String weight;
     private String breed;
 
-    public Pet(String name, Type type, Sex sex, Address address, int age, double weight, String breed) {
+    public Pet(String name, Type type, Sex sex, Address address, String age, String weight, String breed) {
         this.name = name;
         this.type = type;
         this.sex = sex;

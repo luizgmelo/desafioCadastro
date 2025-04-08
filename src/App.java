@@ -50,7 +50,7 @@ public class App {
 
                     if (name.isEmpty()) {
                         throw new RuntimeException("O nome do pet é um campo obrigatório");
-                    } else if (hasOnlyAlphabetical(name)) {
+                    } else if (!hasOnlyAlphabetical(name)) {
                         throw new RuntimeException("O nome do pet só pode conter letras");
                     }
 
@@ -74,7 +74,7 @@ public class App {
                     // 4. Qual endereço e bairro que ele foi encontrado?
                     System.out.println(asksFile.nextLine());
                     System.out.print(asksFile.nextLine());
-                    int houseNumber = scanner.nextInt();
+                    int 'houseNumber' = scanner.nextInt();
                     scanner.nextLine();
                     System.out.print(asksFile.nextLine());
                     String city = scanner.nextLine();
@@ -82,30 +82,43 @@ public class App {
                     String street = scanner.nextLine();
                     System.out.print(asksFile.nextLine());
                     String neighborhood = scanner.nextLine();
+
                     // 5. Qual a idade em anos aproximada do pet?
                     System.out.print(asksFile.nextLine());
-                    String age = scanner.nextLine();
+                    String ageString = scanner.nextLine();
 
-                    if (age.isEmpty()) {
-                        age = NOT_INFORMED;
+                    if (ageString.isEmpty()) {
+                        ageString = NOT_INFORMED;
                     }
 
-//                    int age;
-//                    try {
-//                        age = (int) ageString;
-//                    } catch (NumberFormatException e) {
-//                        throw new RuntimeException("A idade deve ser um número inteiro");
-//                    }
+                    try {
+                        double age = Double.parseDouble(ageString.replace(',', '.'));
+
+                        if (age <= 0 || age > 20) {
+                            throw new RuntimeException("A idade deve ser entre 0.1 e 20 anos.");
+                        }
+                    } catch (NumberFormatException e) {
+                        throw new NumberFormatException("A idade deve ser um número inteiro");
+                    }
 
                     // 6. Qual o peso em kilos aproximado do pet?
                     System.out.print(asksFile.nextLine());
-                    String weight = scanner.nextLine(); // 2.2kg 2,2kg
+                    String weightString = scanner.nextLine();
 
-                    if (weight.isEmpty()) {
-                        weight = NOT_INFORMED;
+                    if (weightString.isEmpty()) {
+                        weightString = NOT_INFORMED;
                     }
 
+                    try {
+                        double weight = Double.parseDouble(weightString.replace(',', '.'));
 
+                        if (weight < 0.5 || weight > 60.0) {
+                            throw new RuntimeException("O peso deve ser um número entre 0.5kg e 60kg");
+                        }
+
+                    } catch (NumberFormatException e) {
+                        throw new NumberFormatException("O peso deve ser um número decimal");
+                    }
 
 
 
@@ -114,8 +127,12 @@ public class App {
                     System.out.print(asksFile.nextLine());
                     String breed = scanner.nextLine();
 
+                    if (!hasOnlyAlphabetical(breed)) {
+                        throw new RuntimeException("A raça somente deve conter letras.");
+                    }
+
                     Address address = new Address(houseNumber, city, street, neighborhood);
-                    Pet pet = new Pet(name, type, sex, address, age, weight, breed);
+                    Pet pet = new Pet(name, type, sex, address, ageString, weightString, breed);
 
                     System.out.println(pet);
 
@@ -144,6 +161,10 @@ public class App {
     }
 
     public static boolean hasOnlyAlphabetical(String string) {
-        return !string.matches("^[a-zA-Z]+$");
+        return string.matches("^[a-zA-Z]+$");
+    }
+
+    public static boolean isValidDecimal(String decimal) {
+        return decimal.matches("^[0-9]+(.|,)[0-9]+$");
     }
 }
