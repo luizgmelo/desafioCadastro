@@ -7,8 +7,9 @@ import src.models.pet.Type;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class App {
 
                     if (name.isEmpty()) {
                         throw new RuntimeException("O nome do pet é um campo obrigatório");
-                    } else if (!hasOnlyAlphabetical(name)) {
+                    } else if (hasNumbersOrSpecialCharacters(name)) {
                         throw new RuntimeException("O nome do pet só pode conter letras");
                     }
 
@@ -74,12 +75,24 @@ public class App {
                     // 4. Qual endereço e bairro que ele foi encontrado?
                     System.out.println(asksFile.nextLine());
                     System.out.print(asksFile.nextLine());
-                    int 'houseNumber' = scanner.nextInt();
-                    scanner.nextLine();
+                    String houseNumber = scanner.nextLine();
+
+                    if (houseNumber.isEmpty()) {
+                        houseNumber = NOT_INFORMED;
+                    } else {
+                        try {
+                            Integer.parseInt(houseNumber);
+                        } catch (NumberFormatException e) {
+                            throw new NumberFormatException("O número da casa deve ser um número inteiro");
+                        }
+                    }
+
                     System.out.print(asksFile.nextLine());
                     String city = scanner.nextLine();
+
                     System.out.print(asksFile.nextLine());
                     String street = scanner.nextLine();
+
                     System.out.print(asksFile.nextLine());
                     String neighborhood = scanner.nextLine();
 
@@ -89,16 +102,16 @@ public class App {
 
                     if (ageString.isEmpty()) {
                         ageString = NOT_INFORMED;
-                    }
+                    } else {
+                        try {
+                            double age = Double.parseDouble(ageString.replace(',', '.'));
 
-                    try {
-                        double age = Double.parseDouble(ageString.replace(',', '.'));
-
-                        if (age <= 0 || age > 20) {
-                            throw new RuntimeException("A idade deve ser entre 0.1 e 20 anos.");
+                            if (age <= 0 || age > 20) {
+                                throw new RuntimeException("A idade deve ser entre 0.1 e 20 anos.");
+                            }
+                        } catch (NumberFormatException e) {
+                            throw new NumberFormatException("A idade deve ser um número inteiro");
                         }
-                    } catch (NumberFormatException e) {
-                        throw new NumberFormatException("A idade deve ser um número inteiro");
                     }
 
                     // 6. Qual o peso em kilos aproximado do pet?
@@ -107,32 +120,31 @@ public class App {
 
                     if (weightString.isEmpty()) {
                         weightString = NOT_INFORMED;
-                    }
+                    } else {
+                        try {
+                            double weight = Double.parseDouble(weightString.replace(',', '.'));
 
-                    try {
-                        double weight = Double.parseDouble(weightString.replace(',', '.'));
+                            if (weight < 0.5 || weight > 60.0) {
+                                throw new RuntimeException("O peso deve ser um número entre 0.5kg e 60kg");
+                            }
 
-                        if (weight < 0.5 || weight > 60.0) {
-                            throw new RuntimeException("O peso deve ser um número entre 0.5kg e 60kg");
+                        } catch (NumberFormatException e) {
+                            throw new NumberFormatException("O peso deve ser um número decimal");
                         }
-
-                    } catch (NumberFormatException e) {
-                        throw new NumberFormatException("O peso deve ser um número decimal");
                     }
-
-
 
                     // 7.
                     scanner.nextLine();
                     System.out.print(asksFile.nextLine());
                     String breed = scanner.nextLine();
 
-                    if (!hasOnlyAlphabetical(breed)) {
+                    if (hasNumbersOrSpecialCharacters(breed)) {
                         throw new RuntimeException("A raça somente deve conter letras.");
                     }
 
                     Address address = new Address(houseNumber, city, street, neighborhood);
                     Pet pet = new Pet(name, type, sex, address, ageString, weightString, breed);
+                    savePetFile(pet);
 
                     System.out.println(pet);
 
@@ -160,11 +172,12 @@ public class App {
         } while (option < 1 || option > 6);
     }
 
-    public static boolean hasOnlyAlphabetical(String string) {
-        return string.matches("^[a-zA-Z]+$");
+    public static boolean hasNumbersOrSpecialCharacters(String string) {
+        return !string.matches("^[a-zA-Z]+$");
     }
 
-    public static boolean isValidDecimal(String decimal) {
-        return decimal.matches("^[0-9]+(.|,)[0-9]+$");
+    public static void savePetFile(Pet pet) {
+        Path path = Path.of("");
+        System.out.println(path);
     }
 }
