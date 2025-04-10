@@ -14,4 +14,6 @@ public class Menu {
         System.out.println(MENU);
         System.out.print("Digite uma das opções acima: ");
     }
+
+
 }

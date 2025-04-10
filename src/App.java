@@ -5,23 +5,24 @@ import src.models.pet.Pet;
 import src.models.pet.Sex;
 import src.models.pet.Type;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Scanner;
-import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        File file = new File("src/formulario.txt");
-        Scanner asksFile = null;
-        Scanner scanner = new Scanner(System.in);
         Menu menu = new Menu();
-        List<String> answers = new ArrayList<>();
-        String NOT_INFORMED = "NÃO INFORMADO";
+        File file = new File("formulario.txt");
+        Scanner scanner = new Scanner(System.in);
+        final String NOT_INFORMED = "NÃO INFORMADO";
 
+        Scanner asksFile;
         try {
             asksFile = new Scanner(file);
         } catch (FileNotFoundException e) {
@@ -58,10 +59,12 @@ public class App {
                     // 2. Qual o tipo do pet (Cachorro/Gato)?
                     System.out.print(asksFile.nextLine());
                     Type type;
+
                     try {
                         type = Type.valueOf(scanner.nextLine().toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        throw new RuntimeException("O tipo do pet só pode ser Cachorro ou Gato");
+                        // TODO pegar os valores do Enum sem precisar escrever na string
+                        throw new RuntimeException("O tipo do pet só pode ser " + String.join(", ", Type.values()));
                     }
 
                     // 3. Qual o sexo do animal?
@@ -70,8 +73,10 @@ public class App {
                     try {
                         sex = Sex.valueOf(scanner.nextLine().toUpperCase());
                     } catch (IllegalArgumentException e) {
+                        // TODO pegar os valores do Enum sem precisar escrever na string
                         throw new RuntimeException("O sexo do pet só pode ser Macho ou Femea");
                     }
+
                     // 4. Qual endereço e bairro que ele foi encontrado?
                     System.out.println(asksFile.nextLine());
                     System.out.print(asksFile.nextLine());
@@ -133,18 +138,22 @@ public class App {
                         }
                     }
 
-                    // 7.
-                    scanner.nextLine();
+                    // 7. Qual a raça do pet?
                     System.out.print(asksFile.nextLine());
                     String breed = scanner.nextLine();
 
-                    if (hasNumbersOrSpecialCharacters(breed)) {
+                    if (hasNumbersOrSpecialCharacters(breed) && !breed.isEmpty()) {
                         throw new RuntimeException("A raça somente deve conter letras.");
                     }
 
                     Address address = new Address(houseNumber, city, street, neighborhood);
                     Pet pet = new Pet(name, type, sex, address, ageString, weightString, breed);
-                    savePetFile(pet);
+
+                    try {
+                        savePetFile(pet);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Erro ao criar arquivo do pet");
+                    }
 
                     System.out.println(pet);
 
@@ -173,11 +182,26 @@ public class App {
     }
 
     public static boolean hasNumbersOrSpecialCharacters(String string) {
-        return !string.matches("^[a-zA-Z]+$");
+        return !string.matches("^[ a-zA-Z]+$");
     }
 
-    public static void savePetFile(Pet pet) {
-        Path path = Path.of("");
-        System.out.println(path);
+    public static void savePetFile(Pet pet) throws IOException {
+        String fileName = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm").format(LocalDateTime.now()) + " - " +
+                            pet.getName().toUpperCase().replaceAll("\\s", "") + ".txt";
+
+        Path fileFolder = Paths.get("petsCadastrados");
+        if (Files.notExists(fileFolder)) {
+            Files.createDirectory(fileFolder);
+        }
+
+        Path filePath = Paths.get(fileFolder.toString(), fileName);
+        if (Files.notExists(filePath)) {
+            Files.createFile(filePath);
+        }
+
+//        Um metódo para escrever no arquivo
+//        try (BufferedWriter bw = Files.newBufferedWriter(filePath, StandardOpenOption.APPEND)) {
+//
+//        };
     }
 }

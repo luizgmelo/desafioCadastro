@@ -23,6 +23,34 @@ public class Pet {
         this.breed = breed;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
     @Override
     public String toString() {
         return "Pet{" +
